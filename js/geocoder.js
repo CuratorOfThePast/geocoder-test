@@ -1,17 +1,22 @@
-console.log("Geocoder gestartet!");
-
+// OHM Overpass-Geocoder – Abfragefunktionen
 async function searchOHM(street, housenumber, year) {
+  console.log("Abfrage gestartet:", street, housenumber, year);
+
   const query = `
   [out:json];
-  node
-    ["addr:street"="${street}"]
-    ["addr:housenumber"="${housenumber}"];
+  node["addr:street"="${street}"]["addr:housenumber"="${housenumber}"];
   out body;
   `;
+
   const url = "https://overpass-api.openhistoricalmap.org/api/interpreter";
   const resp = await fetch(url + "?data=" + encodeURIComponent(query));
+
+  if (!resp.ok) throw new Error("Fehler bei Overpass: " + resp.statusText);
+
   const data = await resp.json();
-  const results = data.elements.map(el => ({
+  if (!data.elements || data.elements.length === 0) return [];
+
+  return data.elements.map(el => ({
     street: el.tags["addr:street"],
     housenumber: el.tags["addr:housenumber"],
     city: el.tags["addr:city"],
@@ -20,22 +25,4 @@ async function searchOHM(street, housenumber, year) {
     lat: el.lat,
     lon: el.lon
   }));
-  showResults(results);
-}
-
-document.getElementById("search").addEventListener("click", () => {
-  const street = document.getElementById("street").value;
-  const housenumber = document.getElementById("housenumber").value;
-  const year = document.getElementById("year").value;
-  searchOHM(street, housenumber, year);
-});
-
-function showResults(results) {
-  const div = document.getElementById("results");
-  div.innerHTML = results.map(r => `
-    <p>
-      <strong>${r.street} ${r.housenumber}</strong><br>
-      Koordinaten: ${r.lat.toFixed(5)}, ${r.lon.toFixed(5)}<br>
-      Zeitraum: ${r.start_date || "?"} – ${r.end_date || "?"}
-    </p>`).join("");
 }
