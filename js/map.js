@@ -14,6 +14,14 @@ function initMap() {
   map.addControl(new maplibregl.NavigationControl());
 }
 
+  // Jahresfilter, falls angegeben
+if (year && map.filterByDate) { 
+    map.once('styledata', () => {
+      map.filterByDate(year + "-01-01"); // filtert Tiles nach Jahr
+    });
+  }
+}
+
 function showOnMap(results) {
   // alte Marker entfernen
   markers.forEach(m => m.remove());
