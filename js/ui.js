@@ -22,13 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
 // Jahr filtern, falls angegeben
 let filteredResults = results;
 if (year) {
+  const y = parseInt(year);
   filteredResults = results.filter(r => {
-    const start = r.start_date ? parseInt(r.start_date) : -Infinity;
-    const end = r.end_date ? parseInt(r.end_date) : Infinity;
-    const y = parseInt(year);
+    // Jahr aus start_date und end_date extrahieren
+    const start = r.start_date ? parseInt(r.start_date.match(/\d{4}/)?.[0]) : -Infinity;
+    const end = r.end_date ? parseInt(r.end_date.match(/\d{4}/)?.[0]) : Infinity;
+
+    // NaN abfangen
+    if (isNaN(start) && isNaN(end)) return true;      // keine Daten → anzeigen
+    if (isNaN(start)) return y <= end;
+    if (isNaN(end)) return y >= start;
+
     return y >= start && y <= end;
   });
 }
+
 
 if (!filteredResults.length) {
   resultsDiv.innerHTML = "<p>Keine Ergebnisse für dieses Jahr gefunden.</p>";
