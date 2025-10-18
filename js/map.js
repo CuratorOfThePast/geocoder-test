@@ -1,25 +1,43 @@
-// Leaflet-Karte für Anzeige der Suchergebnisse
+// MapLibre GL JS Karte
 let map;
-let markerLayer;
+let markers = [];
 
 function initMap() {
-  map = L.map("map").setView([52.52, 13.405], 12); // Berlin als Start
-  L.tileLayer("https://tile.openhistoricalmap.org/ohm/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openhistoricalmap.org/">OpenHistoricalMap</a>'
-  }).addTo(map);
-  markerLayer = L.layerGroup().addTo(map);
+  map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://www.openhistoricalmap.org/map-styles/main/main.json',
+    center: [13.405, 52.52], // Berlin
+    zoom: 12,
+    attributionControl: true
+  });
+
+  // Optional: Zoom-Controls
+  map.addControl(new maplibregl.NavigationControl());
 }
 
 function showOnMap(results) {
-  markerLayer.clearLayers();
+  // alte Marker entfernen
+  markers.forEach(m => m.remove());
+  markers = [];
+
   if (!results.length) return;
+
   results.forEach(r => {
-    const marker = L.marker([r.lat, r.lon])
-      .bindPopup(`<b>${r.street} ${r.housenumber}</b><br>
-                  ${r.city || ""}<br>
-                  Zeitraum: ${r.start_date || "?"}–${r.end_date || "?"}`);
-    markerLayer.addLayer(marker);
+    const popup = new maplibregl.Popup({ offset: 25 })
+      .setHTML(`<b>${r.street} ${r.housenumber}</b><br>
+                ${r.city || ""}<br>
+                Zeitraum: ${r.start_date || "?"} – ${r.end_date || "?"}`);
+
+    const marker = new maplibregl.Marker()
+      .setLngLat([r.lon, r.lat])
+      .setPopup(popup)
+      .addTo(map);
+
+    markers.push(marker);
   });
-  const bounds = L.latLngBounds(results.map(r => [r.lat, r.lon]));
-  map.fitBounds(bounds);
+
+  // Map auf alle Marker zoomen
+  const bounds = new maplibregl.LngLatBounds();
+  results.forEach(r => bounds.extend([r.lon, r.lat]));
+  map.fitBounds(bounds, { padding: 50 });
 }
