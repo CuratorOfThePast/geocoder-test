@@ -4,16 +4,24 @@
   <meta charset="UTF-8">
   <title>OHM Historischer Geocoder</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
-  <h1>OpenHistoricalMap – Adresssuche</h1>
-  <input id="street" placeholder="Straße">
-  <input id="housenumber" placeholder="Hausnummer">
-  <input id="year" placeholder="Jahr (optional)">
-  <button id="search">Suchen</button>
+  <h1>OpenHistoricalMap – Historischer Geocoder</h1>
+
+  <div class="search-box">
+    <input id="street" placeholder="Straße">
+    <input id="housenumber" placeholder="Hausnummer">
+    <input id="year" placeholder="Jahr (optional)">
+    <button id="search">Suchen</button>
+  </div>
 
   <div id="results"></div>
+  <div id="map"></div>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="js/geocoder.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>
