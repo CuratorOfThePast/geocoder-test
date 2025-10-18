@@ -18,20 +18,35 @@ document.addEventListener("DOMContentLoaded", () => {
     resultsDiv.innerHTML = "<p>Suche läuft …</p>";
     try {
       const results = await searchOHM(street, housenumber, year);
-      if (!results.length) {
-        resultsDiv.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
-        showOnMap([]);
-        return;
-      }
-      resultsDiv.innerHTML = results.map(r => `
-        <div class="result">
-          <strong>${r.street} ${r.housenumber}</strong><br>
-          ${r.city || ""}<br>
-          Koordinaten: ${r.lat.toFixed(5)}, ${r.lon.toFixed(5)}<br>
-          Zeitraum: ${r.start_date || "?"} – ${r.end_date || "?"}
-        </div>
-      `).join("");
-      showOnMap(results);
+
+// Jahr filtern, falls angegeben
+let filteredResults = results;
+if (year) {
+  filteredResults = results.filter(r => {
+    const start = r.start_date ? parseInt(r.start_date) : -Infinity;
+    const end = r.end_date ? parseInt(r.end_date) : Infinity;
+    const y = parseInt(year);
+    return y >= start && y <= end;
+  });
+}
+
+if (!filteredResults.length) {
+  resultsDiv.innerHTML = "<p>Keine Ergebnisse für dieses Jahr gefunden.</p>";
+  showOnMap([]);
+  return;
+}
+
+resultsDiv.innerHTML = filteredResults.map(r => `
+  <div class="result">
+    <strong>${r.street} ${r.housenumber}</strong><br>
+    ${r.city || ""}<br>
+    Koordinaten: ${r.lat.toFixed(5)}, ${r.lon.toFixed(5)}<br>
+    Zeitraum: ${r.start_date || "?"} – ${r.end_date || "?"}
+  </div>
+`).join("");
+
+showOnMap(filteredResults);
+
     } catch (err) {
       console.error(err);
       resultsDiv.innerHTML = "<p>Fehler beim Abrufen der Daten.</p>";
