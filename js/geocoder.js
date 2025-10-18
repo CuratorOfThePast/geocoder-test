@@ -1,3 +1,5 @@
+console.log("Geocoder gestartet!");
+
 async function searchOHM(street, housenumber, year) {
   const query = `
   [out:json];
