@@ -11,7 +11,6 @@ function initMap() {
     attributionControl: true
   });
 
-  // Optional: Zoom-Controls
   map.addControl(new maplibregl.NavigationControl());
 }
 
@@ -36,7 +35,6 @@ function showOnMap(results) {
     markers.push(marker);
   });
 
-  // Map auf alle Marker zoomen
   const bounds = new maplibregl.LngLatBounds();
   results.forEach(r => bounds.extend([r.lon, r.lat]));
   map.fitBounds(bounds, { padding: 50 });
